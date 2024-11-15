@@ -68,7 +68,7 @@ const createRequestBody = (question, answerIndex = 0) => {
             "answer": answerIndex.toString(),
             "correct": "T",
             "div_id": question.id,
-            "course_name": "GMHS_CSAwesome_2024",
+            "course_name": eBookConfig.course,
             "clientLoginStatus": true,
             "timezoneoffset": 5,
             "percent": question.scoreMax,
@@ -79,7 +79,7 @@ const createRequestBody = (question, answerIndex = 0) => {
             "act": `percent:100.00:passed:${question.scoreMax}:failed:0`,
             "div_id": question.id,
             "event": "unittest",
-            "course_name": "GMHS_CSAwesome_2024",
+            "course_name": eBookConfig.course,
             "clientLoginStatus": true,
             "timezoneoffset": 5,
             "assignment_id": assignment_id
