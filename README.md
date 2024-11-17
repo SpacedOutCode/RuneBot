@@ -32,6 +32,7 @@ javascript:'use%20strict'%3Bvar%20id%3D%22a912b7f4a07202c612b694d66d8165cf%22%2C
 2. Click the "RuneBot" bookmark you created
 3. Watch the console (F12 > Console) for progress updates
 4. Wait for all questions to be processed
+5. Refresh the page to see results
 
 ## ⚙️ How It Works
 
