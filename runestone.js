@@ -1,38 +1,188 @@
-const heads = {
-  accept: "application/json",
-  "accept-language": "en-US,en;q=0.9",
-  "content-type": "application/json; charset=utf-8",
-  priority: "u=1, i",
-  "sec-ch-ua": '"Chromium";v="130", "Google Chrome";v="130", "Not?A_Brand";v="99"',
-  "sec-ch-ua-mobile": "?0",
-  "sec-ch-ua-platform": '"Windows"',
-  "sec-fetch-dest": "empty",
-  "sec-fetch-mode": "cors",
-  "sec-fetch-site": "same-origin",
+// Modify the styles - remove logs container and add status text styling
+const styles = `
+.runebot-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 400px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+    color: white;
+    z-index: 10000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.runebot-header {
+    padding: 10px;
+    border-radius: 8px 8px 0 0;
+    cursor: move;
+    user-select: none;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.runebot-logo {
+    max-width: 200px;
+}
+
+.runebot-creator {
+    text-align: center;
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.runebot-button {
+    display: block;
+    width: 90%;
+    margin: 10px auto;
+    padding: 10px;
+    background: #8A2BE2;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.runebot-button:hover {
+    background: #9A3FF2;
+}
+
+.runebot-status {
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    transition: color 0.3s ease;
+}
+
+/* Add specific status colors */
+.status-info { color: #4A90E2; }     /* Blue for processing */
+.status-success { color: #4CAF50; }   /* Green for success */
+.status-special { color: #8A2BE2; }   /* Purple for special messages */
+.status-error { color: #FF4444; }     /* Red for errors */`;
+
+const styleSheet = document.createElement("style");
+styleSheet.textContent = styles;
+document.head.appendChild(styleSheet);
+
+// Create the GUI container
+const container = document.createElement("div");
+container.className = "runebot-container";
+
+// Add the header (draggable area)
+const header = document.createElement("div");
+header.className = "runebot-header";
+
+// Add the logo
+const logoDiv = document.createElement("div");
+logoDiv.className = "runebot-logo";
+logoDiv.innerHTML = `
+    <img src="https://spaced.gg/assets/logoLarge.png" alt="Spaced" />
+`;
+
+// Add creator text
+const creatorDiv = document.createElement("div");
+creatorDiv.className = "runebot-creator";
+creatorDiv.textContent = "Made by SpacedOutCode";
+
+// Add the button
+const button = document.createElement("button");
+button.className = "runebot-button";
+button.textContent = "Answer All";
+
+// Add status text div
+const statusDiv = document.createElement("div");
+statusDiv.className = "runebot-status";
+
+// Assemble the GUI
+header.appendChild(logoDiv);
+header.appendChild(creatorDiv);
+container.appendChild(header);
+container.appendChild(button);
+container.appendChild(statusDiv);
+document.body.appendChild(container);
+
+// Make the window draggable
+let isDragging = false;
+let currentX;
+let currentY;
+let initialX;
+let initialY;
+
+header.addEventListener("mousedown", dragStart);
+document.addEventListener("mousemove", drag);
+document.addEventListener("mouseup", dragEnd);
+
+function dragStart(e) {
+    initialX = e.clientX - container.offsetLeft;
+    initialY = e.clientY - container.offsetTop;
+    isDragging = true;
+}
+
+function drag(e) {
+    if (isDragging) {
+        e.preventDefault();
+        currentX = e.clientX - initialX;
+        currentY = e.clientY - initialY;
+        container.style.left = currentX + "px";
+        container.style.top = currentY + "px";
+    }
+}
+
+function dragEnd() {
+    isDragging = false;
+}
+
+// Override console.log for the script
+const originalLog = console.log;
+console.log = function (message, style = '') {
+    originalLog.apply(console, arguments);
+
+    // Clean the message from CSS formatting
+    const cleanMessage = typeof message === 'string' ? message.replace(/%c/g, '').trim() : message;
+
+    // Remove all status classes first
+    statusDiv.classList.remove('status-info', 'status-success', 'status-special', 'status-error');
+
+    // Add appropriate class based on the style
+    if (style.includes('#4A90E2')) {
+        statusDiv.classList.add('status-info');
+    } else if (style.includes('#4CAF50')) {
+        statusDiv.classList.add('status-success');
+    } else if (style.includes('#8A2BE2')) {
+        statusDiv.classList.add('status-special');
+    } else if (style.includes('#FF4444')) {
+        statusDiv.classList.add('status-error');
+    }
+
+    statusDiv.textContent = cleanMessage;
 };
 
-// ASCII art logo with purple S
-console.log(`%c   ██████╗%c █████╗ ██████╗  █████╗  ███████╗██████╗
-  %c██╔════╝%c██╔══██╗██╔══██╗██╔══██╗██╔════╝██╔══██╗
-  %c╚█████╗ %c██████╔╝███████║██║  ╚═╝█████╗  ██║  ██║
-  %c ╚═══██╗%c██╔═══╝ ██╔══██║██║  ██╗██╔══╝  ██║  ██║
-  %c██████╔╝%c██║     ██║  ██║╚█████╔╝███████╗██████╔╝
-  %c╚═════╝ %c╚═╝     ╚═╝  ╚═╝ ╚════╝ ╚══════╝╚═════╝`,
- 'color: #8A2BE2; font-weight: bold;',
- 'color: white; font-weight: bold;',
- 'color: #8A2BE2; font-weight: bold;',
- 'color: white; font-weight: bold;',
- 'color: #8A2BE2; font-weight: bold;',
- 'color: white; font-weight: bold;',
- 'color: #8A2BE2; font-weight: bold;',
- 'color: white; font-weight: bold;',
- 'color: #8A2BE2; font-weight: bold;',
- 'color: white; font-weight: bold;',
- 'color: #8A2BE2; font-weight: bold;',
- 'color: white; font-weight: bold;',
-);
-console.log('%c❕Made By SpacedOutCode', 'color: #FFFFFF; font-weight: bold;');
-console.log('\n%c⚡ Starting RuneBot...', 'color: #8A2BE2; font-weight: bold; font-size: 14px;');
+
+const heads = {
+    accept: "application/json",
+    "accept-language": "en-US,en;q=0.9",
+    "content-type": "application/json; charset=utf-8",
+    priority: "u=1, i",
+    "sec-ch-ua": '"Chromium";v="130", "Google Chrome";v="130", "Not?A_Brand";v="99"',
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": '"Windows"',
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "same-origin",
+};
 
 const assignment_id = parseInt(window.location.href.split("assignment_id=")[1]);
 
@@ -43,18 +193,18 @@ let questions = [];
 document.querySelectorAll(".runestone_caption_divid").forEach((div) => {
     const divText = div.parentNode.innerText.toLowerCase();
     const questionId = div.innerText.replace(/[()]/g, "");
-    
+
     if (divText.includes("multiple choice")) {
         questions.push({
             id: questionId,
             type: "multiple choice",
-            scoreMax: parseInt(document.querySelector(`#${questionId}_score > span.qmaxscore`).innerText)
+            scoreMax: document.querySelector(`#${questionId}_score > span.qmaxscore`) ? parseInt(document.querySelector(`#${questionId}_score > span.qmaxscore`).innerText) : 1
         });
     } else if (divText.includes("activecode")) {
         questions.push({
             id: questionId,
             type: "activecode",
-            scoreMax: parseInt(document.querySelector(`#${questionId}_score > span.qmaxscore`).innerText)
+            scoreMax: document.querySelector(`#${questionId}_score > span.qmaxscore`) ? parseInt(document.querySelector(`#${questionId}_score > span.qmaxscore`).innerText) : 1
         });
     }
 });
@@ -87,6 +237,17 @@ const createRequestBody = (question, answerIndex = 0) => {
     }
 };
 
+const localStorageKey = (id) => {
+    return (
+        eBookConfig.email +
+        ":" +
+        eBookConfig.course +
+        ":" +
+        id +
+        "-given"
+    );
+}
+
 // Helper function to submit a single attempt for a question
 const submitAttempt = async (question, answerIndex) => {
     const body = createRequestBody(question, answerIndex);
@@ -100,71 +261,45 @@ const submitAttempt = async (question, answerIndex) => {
             mode: "cors",
             credentials: "include",
         });
-        
-        // Wait for DOM to update
-        await new Promise(resolve => setTimeout(resolve, 2500));
-        
-        // Check if answer is correct
-        const isCorrect = document.querySelector(`#${question.id}`).parentNode.classList.contains("isCorrect");
-        
-        return {
-            success: response.status === 201,
-            isCorrect: isCorrect
-        };
     } catch (error) {
         console.error(`%c❌ Error submitting question ${question.id}: ${error}`, 'color: #FF4444; font-weight: bold;');
         return { success: false, isCorrect: false };
     }
 };
 
-// Main function to process all questions
 const processQuestions = async () => {
     console.log('%c📝 Found ' + questions.length + ' questions to process', 'color: #8A2BE2; font-weight: bold;');
-    console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #FFF');
-    
+
     for (const question of questions) {
         if (question.type === "multiple choice") {
-            const numOptions = document.querySelectorAll(`#${question.id}_form > label`).length;
-            let correctAnswerFound = false;
-            let correctAnswerIndex = 0;
-            
             console.log(`%c🔍 Processing ${question.type} question: ${question.id}`, 'color: #4A90E2; font-weight: bold;');
-            
-            for (let i = 0; i < numOptions && !correctAnswerFound; i++) {
-                const result = await submitAttempt(question, i);
-                if (result.success && result.isCorrect) {
-                    console.log(`%c✅ Question ${question.id} submitted correctly!`, 'color: #4CAF50; font-weight: bold;');
+            let correctAnswerFound = false;
+
+            let answers = window.componentMap[question.id].answerList;
+            for (answer of answers) {
+                if (answer.correct) {
+                    submitAttempt(question, answers.indexOf(answer));
                     correctAnswerFound = true;
-                    correctAnswerIndex = i;
-                    
-                    // Submit the correct answer a second time
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                    const secondResult = await submitAttempt(question, correctAnswerIndex);
-                    if (secondResult.success) {
-                        console.log(`%c🔄 Question ${question.id} resubmitted successfully!`, 'color: #4CAF50; font-style: italic;');
-                    }
+                    console.log(`%c✅ Question ${question.id} submitted correctly!`, 'color: #4CAF50; font-weight: bold;');
+                    break;
                 }
             }
-        } else if (question.type === "activecode") {
-            console.log(`%c🔍 Processing ${question.type} question: ${question.id}`, 'color: #4A90E2; font-weight: bold;');
-            
-            const result = await submitAttempt(question);
-            if (result.success) {
-                console.log(`%c✅ Question ${question.id} submitted correctly!`, 'color: #4CAF50; font-weight: bold;');
-                
-                // Submit the correct answer a second time
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                const secondResult = await submitAttempt(question);
-                if (secondResult.success) {
-                    console.log(`%c🔄 Question ${question.id} resubmitted successfully!`, 'color: #4CAF50; font-style: italic;');
-                }
+
+            if (!correctAnswerFound) {
+                console.log(`%c❌ Could not find correct answer for ${question.id}`, 'color: #FF4444; font-weight: bold;');
             }
         }
-        console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #FFF');
     }
-    
+
     console.log('%c✨ All questions processed! ✨', 'color: #8A2BE2; font-weight: bold; font-size: 14px;');
 };
 
-// Start processing questions
-processQuestions();
+
+button.addEventListener("click", () => {
+    button.disabled = true;
+    button.textContent = "Processing...";
+    console.log('⚡ Starting RuneBot...');
+    processQuestions().then(() => {
+        button.textContent = "Completed!";
+    });
+});
