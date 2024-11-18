@@ -1,18 +1,16 @@
 # 🚀 RuneBot
 
-A sleek automated solver for Runestone Academy assignments. RuneBot intelligently processes both multiple choice and active code questions with built-in retry mechanisms.
+A sleek automated assistant for Runestone Academy assignments. RuneBot provides an intuitive GUI interface to help process multiple-choice questions with real-time status updates.
 
 ![RuneBot Logo ASCII](https://img.shields.io/badge/RuneBot-Made%20by%20SpacedOutCode-blueviolet)
-![License](https://img.shields.io/badge/license-MIT-green)
 
 ## ⚡ Features
 
-- 📝 Automatic detection and processing of multiple choice questions
-- 💻 Handles active code submissions
-- 🔄 Smart retry mechanism for better success rates
-- 🎨 Beautiful console logging with color-coded status updates
-- ⏱️ Built-in delays to prevent rate limiting
-- 🔍 Intelligent answer verification
+- 🎨 Modern draggable GUI interface with status updates
+- 📝 Automatic detection and processing of multiple-choice questions (soon to be all questions)
+- 🎯 Real-time visual feedback with color-coded status messages
+- 🛡️ Built-in error handling and status reporting
+- 🎨 Sleek dark theme design with purple accents
 
 ## 🔧 Installation
 
@@ -30,44 +28,52 @@ javascript:'use%20strict'%3Bvar%20id%3D%22a912b7f4a07202c612b694d66d8165cf%22%2C
 
 1. Navigate to your Runestone Academy assignment page
 2. Click the "RuneBot" bookmark you created
-3. Watch the console (F12 > Console) for progress updates
-4. Wait for all questions to be processed
-5. Refresh the page to see results
+3. A draggable GUI window will appear in the top-left corner
+4. Click the "Answer All" button to begin processing
+5. Watch the status updates in real-time
+6. Page will automatically refresh when complete
 
 ## ⚙️ How It Works
 
-RuneBot uses a sophisticated approach to handle different question types:
+RuneBot uses a sophisticated approach to handle multiple-choice questions:
 
-### Multiple Choice Questions:
-- Automatically detects number of options
-- Systematically tries each option until correct answer is found
-- Verifies success through DOM updates
-- Resubmits correct answer for verification
+### GUI Features:
+- Draggable interface for better user experience
+- Custom styling with a dark theme
+- The GUI provides real-time status updates with color coding:
+  - 🔍 Processing questions (Blue)
+  - ✅ Successful submissions (Green)
+  - ⚡ System messages (Purple)
+  - ❌ Error messages (Red)
 
-### Active Code Questions:
-- Submits with 100% completion status
-- Includes built-in verification
-- Resubmits successful answers for confirmation
+## ⚠️ Important Notes
 
-## 🎯 Success Indicators
+- The script is designed to work with multiple-choice questions
+- Requires a valid Runestone Academy login session
+- Uses the official Runestone Academy API endpoints (may break if they update anything)
+- Automatically refreshes the page after completion
 
-Watch the console for these status indicators:
-- 🔍 Question processing started
-- ✅ Correct answer submitted
-- 🔄 Answer resubmitted successfully
-- ❌ Error encountered (with details)
+## 📄 License & Copyright
+
+Copyright © 2024 SpacedOutCode. All rights reserved.
+
+This software is released under a custom license that requires:
+1. Mandatory attribution to SpacedOutCode
+2. No commercial use without explicit permission
+3. All modifications must be marked as derivatives
+4. The SpacedOutCode branding in the GUI must be maintained
+5. Distribution requires prior notification to the original author
+
+For licensing inquiries or permissions beyond these terms, please contact SpacedOutCode.
 
 ## ⚠️ Disclaimer
 
-This tool is for educational purposes only. Use responsibly and in accordance with your institution's academic policies.
+This tool is for educational purposes only. Use responsibly and per your institution's academic policies.
 
-## 📄 License
-
-MIT License - feel free to modify and distribute as needed.
 
 ## 🤝 Contributing
 
-Feel free to submit issues and enhancement requests!
+Feel free to submit issues and enhancement requests! The code is structured for easy modifications and improvements.
 
 ---
-Made with 💜 by SpacedOutCode
+Made with 💜 by [SpacedOutCode](https://spaced.gg/)
