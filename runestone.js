@@ -290,7 +290,7 @@ const processQuestions = async () => {
             }
         }
     }
-
+    location.reload();
     console.log('%c✨ All questions processed! ✨', 'color: #8A2BE2; font-weight: bold; font-size: 14px;');
 };
 
