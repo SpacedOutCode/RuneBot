@@ -232,34 +232,20 @@ document.querySelectorAll(".runestone_caption_divid").forEach((div) => {
 });
 
 // Helper function to create body for requests
-const createRequestBody = (question, answerIndex = 0, answer) => {
-  let regex = new RegExp(`[s*^$\]`, "g");
-  let multiSelect = ""; 
-
-  if (window.componentMap[question.id].answer !== undefined) {
-    window.componentMap[question.id].answerList.forEach((answer) => {
-      if (answer.correct) {
-         multiSelect = multiSelect + window.componentMap[question.id].answerList.indexOf(answer) + ",";
-      }
-    });
-    multiSelect = multiSelect.slice(0, -1);
-} else {
-    multiSelect = answerIndex;
-}
-
+const createRequestBody = (question, selectedAnswers) => {
   if (question.type === "multiple choice") {
-        return JSON.stringify({
-            event: "mChoice",
-            act: `answer:${multiSelect}:correct`,
-            answer: multiSelect,
-            correct: "T",
-            div_id: question.id,
-            course_name: eBookConfig.course,
-            clientLoginStatus: true,
-            timezoneoffset: 5,
-            percent: question.scoreMax,
-            assignment_id: assignment_id,
-          });
+    return JSON.stringify({
+      event: "mChoice",
+      act: `answer:${selectedAnswers.join(",")}:correct`,
+      answer: selectedAnswers.join(","),
+      correct: "T",
+      div_id: question.id,
+      course_name: eBookConfig.course,
+      clientLoginStatus: true,
+      timezoneoffset: 5,
+      percent: question.scoreMax,
+      assignment_id: assignment_id,
+    });
   } else if (question.type === "activecode") {
     return JSON.stringify({
       act: `percent:100.00:passed:${question.scoreMax}:failed:0`,
@@ -274,18 +260,10 @@ const createRequestBody = (question, answerIndex = 0, answer) => {
     return JSON.stringify({
       event: "fillb",
       div_id: question.id,
-      act: JSON.stringify([
-        answer.regex
-          ? answer.regex.replace(regex, "").replaceAll("\\", "")
-          : answer.number[0],
-      ]),
-      answer: JSON.stringify([
-        answer.regex
-          ? answer.regex.replace(regex, "").replaceAll("\\", "")
-          : answer.number[0],
-      ]),
+      act: JSON.stringify(selectedAnswers),
+      answer: JSON.stringify(selectedAnswers),
       correct: "T",
-      percent: 1,
+      percent: question.scoreMax,
       course_name: eBookConfig.course,
       clientLoginStatus: true,
       timezoneoffset: 5,
@@ -293,6 +271,7 @@ const createRequestBody = (question, answerIndex = 0, answer) => {
     });
   }
 };
+
 
 const localStorageKey = (id) => {
   return eBookConfig.email + ":" + eBookConfig.course + ":" + id + "-given";
@@ -314,6 +293,10 @@ const submitAttempt = async (question, answerIndex, answer) => {
         credentials: "include",
       }
     );
+
+    if (response.status == 201 || response.status == 200) {
+      return { success: true, isCorrect: true };
+    }
   } catch (error) {
     console.error(
       `%c❌ Error submitting question ${question.id}: ${error}`,
@@ -325,57 +308,67 @@ const submitAttempt = async (question, answerIndex, answer) => {
 
 const processQuestions = async () => {
   console.log(
-    "%c📝 Found " + questions.length + " questions to process",
+    `%c📝 Found ${questions.length} questions to process`,
     "color: #8A2BE2; font-weight: bold;"
   );
 
   for (const question of questions) {
-      if (question.type === "multiple choice") {
-        console.log(
-          `%c🔍 Processing ${question.type} question: ${question.id}`,
-          "color: #4A90E2; font-weight: bold;"
-        );
-        let correctAnswerFound = false;
+    console.log(
+      `%c🔍 Processing ${question.type} question: ${question.id}`,
+      "color: #4A90E2; font-weight: bold;"
+    );
 
-        let answers = window.componentMap[question.id].answerList;
-        for (answer of answers) {
-          if (answer.correct) {
-            submitAttempt(question, answers.indexOf(answer));
-            correctAnswerFound = true;
-            console.log(
-              `%c✅ Question ${question.id} submitted correctly!`,
-              "color: #4CAF50; font-weight: bold;"
-            );
-            break;
-          }
-        }
+    if (question.type === "multiple choice") {
+      let answers = window.componentMap[question.id].answerList;
 
-        if (!correctAnswerFound) {
+      // Collect indices of all correct answers
+      let correctAnswers = answers
+        .map((answer, index) => (answer.correct ? index : null))
+        .filter((index) => index !== null);
+
+      if (correctAnswers.length > 0) {
+        let result = await submitAttempt(question, correctAnswers);
+
+        if (result.isCorrect) {
           console.log(
-            `%c❌ Could not find correct answer for ${question.id}`,
+            `%c✅ Question ${question.id} submitted correctly!`,
+            "color: #4CAF50; font-weight: bold;"
+          );
+        } else {
+          console.log(
+            `%c❌ Failed to submit correct answers for ${question.id}`,
             "color: #FF4444; font-weight: bold;"
           );
         }
-      } else if (question.type === "fill in the blank") {
-        submitAttempt(
-          question,
-          0,
-          window.componentMap[question.id].feedbackArray[0][0]
-        );
-        correctAnswerFound = true;
+      } else {
         console.log(
-          `%c✅ Question ${question.id} submitted correctly!`,
-          "color: #4CAF50; font-weight: bold;"
+          `%c❌ No correct answers found for ${question.id}`,
+          "color: #FF4444; font-weight: bold;"
         );
       }
+    } else if (question.type === "fill in the blank") {
+      let fitb = window.componentMap[question.id].feedbackArray[0][0];
+      let answer;
+      let regex = new RegExp("^\\s*$", "g");
+      if (fitb.number) {
+        answer = fitb.number[0];
+      } else {
+        answer = fitb.replaceAll(regex, "");
+      }
+      await submitAttempt(question, [answer]);
+      console.log(
+        `%c✅ Question ${question.id} submitted correctly!`,
+        "color: #4CAF50; font-weight: bold;"
+      );
+    }
   }
 
-  location.reload();
   console.log(
     "%c✨ All questions processed! ✨",
     "color: #8A2BE2; font-weight: bold; font-size: 14px;"
   );
 };
+
 
 button.addEventListener("click", () => {
   button.disabled = true;
