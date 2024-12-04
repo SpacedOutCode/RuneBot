@@ -88,7 +88,7 @@ header.className = "runebot-header";
 // Add creator text
 const creatorDiv = document.createElement("div");
 creatorDiv.className = "runebot-creator";
-creatorDiv.textContent = "Made by SpacedOutCode";
+creatorDiv.textContent = "v0.4 Made by SpacedOutCode";
 
 // Add the button
 const button = document.createElement("button");
