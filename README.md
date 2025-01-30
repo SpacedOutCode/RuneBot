@@ -1,6 +1,6 @@
 # 🚀 RuneBot
 
-A sleek automated assistant for Runestone Academy assignments. RuneBot provides an intuitive GUI interface to help process multiple-choice questions with real-time status updates.
+A sleek automated assistant for Runestone Academy assignments. RuneBot provides an intuitive GUI interface to help process a variety of questions.
 
 ![RuneBot Logo ASCII](https://img.shields.io/badge/RuneBot-Made%20by%20SpacedOutCode-blueviolet)
 
@@ -8,7 +8,6 @@ A sleek automated assistant for Runestone Academy assignments. RuneBot provides 
 
 - 🎨 Modern draggable GUI interface with status updates
 - 📝 Automatic detection and processing of multiple-choice questions (soon to be all questions)
-- 🎯 Real-time visual feedback with color-coded status messages
 - 🛡️ Built-in error handling and status reporting
 - 🎨 Sleek dark theme design with purple accents
 
@@ -29,7 +28,7 @@ javascript:'use%20strict'%3Bvar%20id%3D%22a912b7f4a07202c612b694d66d8165cf%22%2C
 1. Navigate to your Runestone Academy assignment page
 2. Click the "RuneBot" bookmark you created
 3. A draggable GUI window will appear in the top-left corner
-4. Click the "Answer All" button to begin processing
+4. Click the "Start Bot" button to begin processing
 5. Watch the status updates in real-time
 6. Page will automatically refresh when complete
 
@@ -40,15 +39,10 @@ RuneBot uses a sophisticated approach to handle multiple-choice questions:
 ### GUI Features:
 - Draggable interface for better user experience
 - Custom styling with a dark theme
-- The GUI provides real-time status updates with color coding:
-  - 🔍 Processing questions (Blue)
-  - ✅ Successful submissions (Green)
-  - ⚡ System messages (Purple)
-  - ❌ Error messages (Red)
-
+- 
 ## ⚠️ Important Notes
 
-- The script is designed to work with multiple-choice questions
+- The script is designed to work with multiple-choice, fill in the blank, and parsons questions
 - Requires a valid Runestone Academy login session
 - Uses the official Runestone Academy API endpoints (may break if they update anything)
 - Automatically refreshes the page after completion
