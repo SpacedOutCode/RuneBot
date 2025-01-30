@@ -317,32 +317,39 @@ problems = window.allComponents
     };
   });
 
-// Start the bot
-const startBot = () => {
-  problems.forEach((prob) => {
-    if (types[prob.type] && !prob.isCorrect) {
-      // Check if prob.type is a key in the types object
-      const body = createBody(prob);
-      fetch("https://runestone.academy/ns/logger/bookevent", {
-        method: "POST",
-        headers: heads,
-        body: body,
-      })
-        .then((response) =>
-          console.log(
-            response.status === 201
-              ? `Answered ${prob.id} successfully`
-              : "Error"
-          )
-        )
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-    }
-  });
+// Start the bot (modified version)
+const startBot = async () => {
+  const button = document.querySelector('.runebot-start-button');
+  button.disabled = true;
+  button.textContent = "Processing...";
 
-  fetch("https://runestone.academy/runestone/assignments/student_autograde", {
-    headers: {
+  try {
+    // Process all questions first
+    const questionPromises = problems
+      .filter(prob => types[prob.type] && !prob.isCorrect)
+      .map(prob => 
+        fetch("https://runestone.academy/ns/logger/bookevent", {
+          method: "POST",
+          headers: heads,
+          body: createBody(prob)
+        })
+        .then(response => {
+          console.log(response.status === 201 ? 
+            `Answered ${prob.id} successfully` : `Error with ${prob.id}`);
+          return response.ok;
+        })
+        .catch(error => {
+          console.error(`Error submitting ${prob.id}:`, error);
+          return false;
+        })
+      );
+
+    // Wait for all question submissions
+    const questionResults = await Promise.all(questionPromises);
+    
+    // Send autograde request after all questions
+    const autogradeResponse = await fetch("https://runestone.academy/runestone/assignments/student_autograde", {
+      headers: {
       accept: "application/json, text/javascript, */*; q=0.01",
       "accept-language": "en-US,en;q=0.9",
       "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
@@ -354,8 +361,23 @@ const startBot = () => {
       Referer: `https://runestone.academy/assignment/student/doAssignment?assignment_id=${assignment_id}`,
       "Referrer-Policy": "strict-origin-when-cross-origin",
     },
-    body: `assignment_id=${assignment_id}`,
-    method: "POST",
-  });
-  window.location.reload();
+      body: `assignment_id=${assignment_id}`,
+      method: "POST"
+    });
+
+    if (autogradeResponse.ok) {
+      console.log("Autograde request completed successfully");
+    }
+
+    // Only reload if all critical requests succeeded
+    if (questionResults.every(Boolean) && autogradeResponse.ok) {
+      window.location.reload();
+    } else {
+      button.textContent = "Completed with errors";
+      console.log("Some requests failed - page not reloaded");
+    }
+  } catch (error) {
+    console.error("Fatal error during processing:", error);
+    button.textContent = "Error!";
+  }
 };
