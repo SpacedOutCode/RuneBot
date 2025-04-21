@@ -32,9 +32,12 @@ javascript:'use%20strict'%3Bvar%20id%3D%22a912b7f4a07202c612b694d66d8165cf%22%2C
 5. Watch the status updates in real-time
 6. Page will automatically refresh when complete
 
-## ⚙️ How It Works
+## ⚙️ Extras
 
-RuneBot uses a sophisticated approach to handle multiple-choice questions:
+### Oneliner #1
+A oneliner that finds the correct answer in a runestone test paste it in and it will log a object with an id like "obj_sde1_optb"; That's the correct answer. To find the component ID, type `window.componentMap[` into the devTools Console an you should see an id with a name that relates to the topic/s of your test. Copy that id and paste it into the `[COMPONENT_ID]` part of the below code.
+
+`window.componentMap['[COMPONENT_ID]'].renderedQuestionArray[parseInt(document.querySelector("li.active a").textContent)-1].question.answerList.find((q) => q.correct)`
 
 ### GUI Features:
 - Draggable interface for better user experience
